@@ -5,6 +5,17 @@
 
     <uses-permission android:name="android.permission.CAMERA" />
 
+    <!-- Feature -->
+    <uses-feature android:name="android.hardware.camera"           android:required="true" />
+    <uses-feature android:name="android.hardware.camera.autofocus" android:required="true" />
+
+    <!-- Screens Supports -->
+    <supports-screens
+        android:largeScreens="true"
+        android:normalScreens="true"
+        android:smallScreens="true"
+        android:anyDensity="true" />
+
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -13,6 +24,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:hardwareAccelerated="true">
+
         <activity
             android:name=".MainActivity"
             android:screenOrientation="landscape">
@@ -21,6 +33,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
     </application>
 
 </manifest>
