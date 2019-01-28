@@ -27,6 +27,17 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if (cropApi != null) { cropApi.onPause(); }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (cropApi != null) { cropApi.onDestroy(); }
+    }
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {

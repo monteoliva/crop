@@ -70,11 +70,6 @@ public class CropApi extends RelativeLayout {
      *******************************************************************************/
         public void createCameraSource() {
             FaceDetector detector = new FaceDetector.Builder(getContext())
-                    .setClassificationType(FaceDetector.ALL_CLASSIFICATIONS)
-                    .setTrackingEnabled(true)
-                    .setMode(FaceDetector.FAST_MODE)
-                    .setProminentFaceOnly(true)
-                    .setMinFaceSize(0.30f)
                     .build();
 
         detector.setProcessor(new MultiProcessor.Builder<>(new GraphicFaceTrackerFactory()).build());
@@ -85,7 +80,7 @@ public class CropApi extends RelativeLayout {
         // start Google Vision
         mCameraSource = new CameraSource.Builder(getContext(), detector)
                 .setFacing(CameraSource.CAMERA_FACING_BACK)
-                .setRequestedFps(30.0f)
+                .setRequestedFps(60f)
                 .setAutoFocusEnabled(true)
                 .build();
     }
