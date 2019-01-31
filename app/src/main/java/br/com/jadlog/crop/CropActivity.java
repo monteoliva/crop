@@ -8,13 +8,13 @@ import android.widget.ImageView;
 
 import br.com.jadlog.crop.ui.CropApi;
 
-public class MainActivity extends AppCompatActivity {
+public class CropActivity extends AppCompatActivity {
     private CropApi cropApi;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.crop_activity);
 
         cropApi = findViewById(R.id.crop);
 

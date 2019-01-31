@@ -5,14 +5,12 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MainActivity">
+    tools:context=".CropActivity">
 
     <br.com.jadlog.crop.ui.CropApi
         android:id="@+id/crop"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
-
-
 
     <ImageView
         android:id="@+id/takePicture"
@@ -22,7 +20,5 @@
         android:layout_centerHorizontal="true"
         android:scaleType="fitXY"
         android:src="@android:drawable/ic_menu_camera"/>
-
-
 
 </RelativeLayout>

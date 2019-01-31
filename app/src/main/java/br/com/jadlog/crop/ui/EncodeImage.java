@@ -42,4 +42,12 @@ public class EncodeImage {
         byte[] decodedBytes = Base64.decode(input, Base64.DEFAULT);
         return BitmapFactory.decodeByteArray(decodedBytes, 0, decodedBytes.length);
     }
+
+    public Bitmap decodedBitmap(byte[] source, int reqWidth, int reqHeight) {
+        final Bitmap old = BitmapFactory.decodeByteArray(source, 0, source.length);
+        final Bitmap bmp = Bitmap.createScaledBitmap(old, reqWidth, reqHeight, false);
+
+        // retorna o Bitmap
+        return bmp;
+    }
 }

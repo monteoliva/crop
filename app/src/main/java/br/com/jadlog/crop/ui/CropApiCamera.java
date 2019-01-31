@@ -2,9 +2,6 @@ package br.com.jadlog.crop.ui;
 
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Rect;
-import android.os.Build;
 import android.support.v4.content.ContextCompat;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -83,7 +80,9 @@ public class CropApiCamera extends FrameLayout {
 	private void startIfReady() throws IOException, SecurityException {
 		if (mStartRequested && mSurfaceAvailable) {
 			SurfaceHolder surfaceHolder = mSurfaceView.getHolder();
+			surfaceHolder.setFixedSize(getWidth(), getHeight());
 			mCameraSource.start(surfaceHolder);
+
 			mStartRequested = false;
 		}
 	}
@@ -122,16 +121,28 @@ public class CropApiCamera extends FrameLayout {
 		@Override
 		public void onShutter() { }
 	};
-
 	CameraSource.PictureCallback myPictureCallback = new CameraSource.PictureCallback() {
 		@Override
 		public void onPictureTaken(byte[] bytes) {
-			Bitmap source = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+			CropiApiRect rect = mView.getRect();
 
-			Rect rect       = mView.getRect();
-			     rect.right = source.getWidth() - rect.left;
+			int top    = rect.getTop();
+			int bottom = rect.getTop();
 
-			Bitmap output = Bitmap.createBitmap (source, rect.left, rect.top, rect.right, rect.bottom);
+			if (rect.getHeight() > 540) {
+				bottom -= 150;
+			}
+			else {
+				bottom += 0;
+				top    += 50;
+			}
+
+			Bitmap source = new EncodeImage().decodedBitmap(bytes, rect.getWidht(), rect.getHeight());
+			Bitmap output = Bitmap.createBitmap (source,
+					rect.getLeft(),
+					top,
+					rect.getRight(),
+					bottom);
 
 			if (listener != null) { listener.onCrop(output); }
 		}

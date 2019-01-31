@@ -4,7 +4,6 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.graphics.Rect;
 import android.os.Build;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
@@ -14,16 +13,18 @@ import android.view.View;
 public class CropApiView extends View {
     private static final String TAG = "CropAPI";
 
-    private Rect rect = new Rect(0, 0, 0, 0);
+    private CropiApiRect rect = new CropiApiRect();
 
     /**
      * Constructor
      * @param context
      */
-    public CropApiView(Context context) { super(context); }
-    public CropApiView(Context context, @Nullable AttributeSet attrs) { super(context, attrs); }
+    public CropApiView(Context context) { super(context); init(); }
+    public CropApiView(Context context, @Nullable AttributeSet attrs) { super(context, attrs); init(); }
 
-    public Rect getRect() { return this.rect; }
+    private void init() { }
+
+    public CropiApiRect getRect() { return this.rect; }
 
     /**********************************************************************
      * Draw
@@ -32,26 +33,25 @@ public class CropApiView extends View {
     public void draw(Canvas canvas) {
         super.draw(canvas);
 
-        final int width  = canvas.getWidth();
-        final int height = canvas.getHeight();
+        int width  = canvas.getWidth();
+        int height = canvas.getHeight();
 
-        final int top    = (height / 2) - 200;
-        final int left   = 70;
-        final int right  = width - 70;
-        final int bottom = top + 250;
+        int top    = (height / 2) - 100;
+        int left   = 70;
+        int right  = width - left;
+        int bottom = top;
 
-        rect.left = 120;
+        if (height > 540) { bottom += 250; }
+        else              { bottom += 120; }
 
-        final String facture = getFacture().toLowerCase();
+        rect.setWidht(width);
+        rect.setHeight(height);
+        rect.setTop(top);
+        rect.setLeft(left);
+        rect.setRight(right);
+        rect.setBottom(bottom);
 
-        if (facture.equals("samsung")) {
-            rect.top    = (height / 2) + 400;
-            rect.bottom = rect.top - 90;
-        }
-        else {
-            rect.top    = (height / 2) + 200;
-            rect.bottom = rect.top - 60;
-        }
+        final String facture = Build.MANUFACTURER;
 
         Log.d(TAG, "fabricante: " + facture);
 
@@ -75,13 +75,11 @@ public class CropApiView extends View {
 
     private void setBackground(Canvas canvas, int left, int top, int right, int bottom) {
         Paint rect_paint = new Paint();
-        rect_paint.setAntiAlias(true);
-        rect_paint.setStyle(Paint.Style.FILL);
-        rect_paint.setColor(Color.BLACK);
-        rect_paint.setAlpha(0x80); // optional
+              rect_paint.setAntiAlias(true);
+              rect_paint.setStyle(Paint.Style.FILL);
+              rect_paint.setColor(Color.BLACK);
+              rect_paint.setAlpha(0x80);
 
         canvas.drawRect(left, top, right, bottom, rect_paint);
     }
-
-    private String getFacture() { return Build.MANUFACTURER; }
 }
