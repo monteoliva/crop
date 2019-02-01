@@ -1,40 +1,37 @@
 package br.com.jadlog.crop;
 
+import android.graphics.Bitmap;
 import android.support.annotation.NonNull;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageView;
 
 import br.com.jadlog.crop.ui.CropApi;
+import br.com.jadlog.crop.ui.OnCropApiListener;
 
-public class CropActivity extends AppCompatActivity {
+public class CropActivity extends CordovaActivity implements View.OnClickListener {
     private CropApi cropApi;
+    private ImageView btn;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.crop_activity);
 
         cropApi = findViewById(R.id.crop);
 
-        ImageView btn = findViewById(R.id.takePicture);
-        btn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                cropApi.takePicture();
-            }
-        });
+        btn = findViewById(R.id.takePicture);
+        btn.setOnClickListener(this);
     }
 
     @Override
-    protected void onPause() {
+    public void onPause() {
         super.onPause();
         if (cropApi != null) { cropApi.onPause(); }
     }
 
     @Override
-    protected void onDestroy() {
+    public void onDestroy() {
         super.onDestroy();
         if (cropApi != null) { cropApi.onDestroy(); }
     }
@@ -45,6 +42,23 @@ public class CropActivity extends AppCompatActivity {
 
         if (cropApi != null) {
             cropApi.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        }
+    }
+
+    @Override
+    public void onClick(View v) {
+        if (v == btn) {
+            cropApi.takePicture(new OnCropApiListener() {
+                @Override
+                public void onCropBitmap(Bitmap bitmap) {
+
+                }
+
+                @Override
+                public void onCropHash(String hash) {
+
+                }
+            });
         }
     }
 }

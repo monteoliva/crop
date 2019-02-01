@@ -5,6 +5,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.util.AttributeSet;
@@ -68,9 +69,9 @@ public class CropApi extends RelativeLayout {
     /*******************************************************************************
      * Camera Source
      *******************************************************************************/
-        public void createCameraSource() {
-            FaceDetector detector = new FaceDetector.Builder(getContext())
-                    .build();
+    public void createCameraSource() {
+        FaceDetector detector = new FaceDetector.Builder(getContext())
+                .build();
 
         detector.setProcessor(new MultiProcessor.Builder<>(new GraphicFaceTrackerFactory()).build());
 
@@ -113,12 +114,18 @@ public class CropApi extends RelativeLayout {
         }
     }
 
-    public void takePicture() {
+    public void takePicture(@NonNull final OnCropApiListener listener) {
         if (mPreview != null) {
             mPreview.takePicture(new OnCropApiListener() {
                 @Override
-                public void onCrop(Bitmap bitmap) {
+                public void onCropBitmap(Bitmap bitmap) {
                     imgResult.setImageBitmap(bitmap);
+                    listener.onCropBitmap(bitmap);
+                }
+
+                @Override
+                public void onCropHash(String hash) {
+                    listener.onCropHash(hash);
                 }
             });
         }

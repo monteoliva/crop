@@ -2,6 +2,7 @@ package br.com.jadlog.crop.ui;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -70,7 +71,7 @@ public class CropApiCamera extends FrameLayout {
 		}
 	}
 
-	public void takePicture(OnCropApiListener listener) {
+	public void takePicture(@NonNull OnCropApiListener listener) {
 		if (mCameraSource != null) {
 			this.listener = listener;
 			mCameraSource.takePicture(myShutterCallback, myPictureCallback);
@@ -124,7 +125,8 @@ public class CropApiCamera extends FrameLayout {
 	CameraSource.PictureCallback myPictureCallback = new CameraSource.PictureCallback() {
 		@Override
 		public void onPictureTaken(byte[] bytes) {
-			CropiApiRect rect = mView.getRect();
+			EncodeImage encodeImage = new EncodeImage();
+			CropiApiRect rect       = mView.getRect();
 
 			int top    = rect.getTop();
 			int bottom = rect.getTop();
@@ -132,19 +134,20 @@ public class CropApiCamera extends FrameLayout {
 			if (rect.getHeight() > 540) {
 				bottom -= 150;
 			}
-			else {
-				bottom += 0;
-				top    += 50;
-			}
 
-			Bitmap source = new EncodeImage().decodedBitmap(bytes, rect.getWidht(), rect.getHeight());
-			Bitmap output = Bitmap.createBitmap (source,
+			Bitmap source = encodeImage.decodedBitmap(bytes, rect.getWidht(), rect.getHeight());
+			Bitmap output = Bitmap.createBitmap(source,
 					rect.getLeft(),
 					top,
 					rect.getRight(),
 					bottom);
 
-			if (listener != null) { listener.onCrop(output); }
+			String hash = encodeImage.encodeImage(output);
+
+			if (listener != null) {
+				listener.onCropBitmap(output);
+				listener.onCropHash(hash);
+			}
 		}
 	};
 }

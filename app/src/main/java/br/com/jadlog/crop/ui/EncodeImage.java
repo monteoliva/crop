@@ -11,6 +11,8 @@ public class EncodeImage {
     public String encodeImage(Bitmap bitmap){
         String retorno = "";
 
+        if (bitmap == null) { return ""; }
+
         try {
             ByteArrayOutputStream stream = new ByteArrayOutputStream();
             bitmap.compress(Bitmap.CompressFormat.PNG, 90, stream);
@@ -37,8 +39,7 @@ public class EncodeImage {
 
     }
 
-    public Bitmap decodeImageBase64(String input)
-    {
+    public Bitmap decodeImageBase64(String input) {
         byte[] decodedBytes = Base64.decode(input, Base64.DEFAULT);
         return BitmapFactory.decodeByteArray(decodedBytes, 0, decodedBytes.length);
     }
