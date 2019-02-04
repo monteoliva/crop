@@ -30,7 +30,9 @@ public class CropApi extends RelativeLayout {
     private CameraSource mCameraSource;
     private CropApiCamera mPreview;
     private View view;
-    private ImageView imgResult;
+    private ImageView imgFlash;
+
+    private boolean isFlash = false;
 
     // permission request codes need to be < 256
     private static final int RC_HANDLE_CAMERA_PERM = 200;
@@ -38,6 +40,11 @@ public class CropApi extends RelativeLayout {
     // pega os Uses Permissions
     private static final String[] permissions = new String[] {
             Manifest.permission.CAMERA
+    };
+
+    private static final int[] resources = new int[] {
+            R.drawable.ic_flash_on,
+            R.drawable.ic_flash_off
     };
 
     /**
@@ -58,20 +65,35 @@ public class CropApi extends RelativeLayout {
         // pega a View
         view = inflater.inflate(R.layout.crop_api, this);
 
-        imgResult = view.findViewById(R.id.imgResult);
         mPreview  = view.findViewById(R.id.facePreview);
+        imgFlash  = view.findViewById(R.id.imgFlash);
+        imgFlash.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) { setImgFlash(); }
+        });
 
         final int rc1 = ActivityCompat.checkSelfPermission(getContext(), permissions[0]);
         if (rc1 == PackageManager.PERMISSION_GRANTED) { startCameraSource(); }
         else { requestCameraPermission(); }
     }
 
+    public void setImgFlash() {
+        if (mPreview != null) {
+            isFlash = !isFlash;
+
+            final int image = (!isFlash) ? resources[1] : resources[0];
+
+            mPreview.setFlash(isFlash);
+
+            imgFlash.setImageDrawable(getResources().getDrawable(image));
+        }
+    }
+
     /*******************************************************************************
      * Camera Source
      *******************************************************************************/
     public void createCameraSource() {
-        FaceDetector detector = new FaceDetector.Builder(getContext())
-                .build();
+        FaceDetector detector = new FaceDetector.Builder(getContext()).build();
 
         detector.setProcessor(new MultiProcessor.Builder<>(new GraphicFaceTrackerFactory()).build());
 
@@ -119,7 +141,6 @@ public class CropApi extends RelativeLayout {
             mPreview.takePicture(new OnCropApiListener() {
                 @Override
                 public void onCropBitmap(Bitmap bitmap) {
-                    imgResult.setImageBitmap(bitmap);
                     listener.onCropBitmap(bitmap);
                 }
 

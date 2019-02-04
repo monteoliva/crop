@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.support.annotation.NonNull;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 
@@ -11,6 +12,8 @@ import br.com.jadlog.crop.ui.CropApi;
 import br.com.jadlog.crop.ui.OnCropApiListener;
 
 public class CropActivity extends CordovaActivity implements View.OnClickListener {
+    private static final String TAG = "CropApi";
+
     private CropApi cropApi;
     private ImageView btn;
 
@@ -55,6 +58,8 @@ public class CropActivity extends CordovaActivity implements View.OnClickListene
 
                 @Override
                 public void onCropHash(String hash) {
+                    Log.d(TAG, "HASH: " + hash);
+
                     Intent intent = new Intent();
                     intent.putExtra("hash", hash);
                     setResult(0, intent);

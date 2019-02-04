@@ -2,6 +2,7 @@ package br.com.jadlog.crop.ui;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.hardware.Camera;
 import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
 import android.util.AttributeSet;
@@ -13,6 +14,7 @@ import android.widget.FrameLayout;
 import com.google.android.gms.vision.CameraSource;
 
 import java.io.IOException;
+import java.lang.reflect.Field;
 
 public class CropApiCamera extends FrameLayout {
 	private static final String TAG = "CropAPI";
@@ -88,6 +90,24 @@ public class CropApiCamera extends FrameLayout {
 		}
 	}
 
+	public void setFlash(@NonNull boolean flash) {
+		Camera camera = getCamera(mCameraSource);
+
+		String[] modes = new String[] {
+				Camera.Parameters.FLASH_MODE_TORCH,
+				Camera.Parameters.FLASH_MODE_OFF
+		};
+
+		if (camera != null) {
+			try {
+				Camera.Parameters param = camera.getParameters();
+				param.setFlashMode((flash) ? modes[0] : modes[1]);
+				camera.setParameters(param);
+			}
+			catch (Exception e) {}
+		}
+	}
+
 	/**********************************************************************
 	 * SurfaceHolder
 	 **********************************************************************/
@@ -150,4 +170,29 @@ public class CropApiCamera extends FrameLayout {
 			}
 		}
 	};
+
+	/**********************************************************************
+	 * Camera Hardware
+	 **********************************************************************/
+	private static Camera getCamera(@NonNull CameraSource cameraSource) {
+		Field[] declaredFields = CameraSource.class.getDeclaredFields();
+
+		for (Field field : declaredFields) {
+			if (field.getType() == Camera.class) {
+				field.setAccessible(true);
+				try {
+					Camera camera = (Camera) field.get(cameraSource);
+					if (camera != null) {
+						return camera;
+					}
+					return null;
+				} catch (IllegalAccessException e) {
+					e.printStackTrace();
+				}
+				break;
+			}
+		}
+		return null;
+	}
+
 }
