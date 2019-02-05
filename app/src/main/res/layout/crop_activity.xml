@@ -16,6 +16,6 @@
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
         android:scaleType="fitXY"
-        android:src="@android:drawable/ic_menu_camera"/>
+        android:src="@android:drawable/ic_menu_camera" />
 
 </RelativeLayout>
