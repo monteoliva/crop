@@ -4,13 +4,14 @@ import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.RelativeLayout;
+import android.widget.FrameLayout;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
@@ -23,9 +24,8 @@ import com.google.android.gms.vision.face.FaceDetector;
 import java.io.IOException;
 
 import br.com.jadlog.crop.R;
-import br.com.jadlog.crop.component.CropFlash;
 
-public class CropApi extends RelativeLayout {
+public class CropApi extends FrameLayout {
     private CameraSource mCameraSource;
     private CropApiCamera mPreview;
     private View view;
@@ -57,13 +57,6 @@ public class CropApi extends RelativeLayout {
         view = inflater.inflate(R.layout.crop_api, this);
 
         mPreview = view.findViewById(R.id.facePreview);
-
-        final CropFlash cropFlash = view.findViewById(R.id.imgFlash);
-        cropFlash.setCropApiCamera(mPreview);
-        cropFlash.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) { cropFlash.setFlash(); }
-        });
 
         final int rc1 = ActivityCompat.checkSelfPermission(getContext(), permissions[0]);
         if (rc1 == PackageManager.PERMISSION_GRANTED) { startCameraSource(); }

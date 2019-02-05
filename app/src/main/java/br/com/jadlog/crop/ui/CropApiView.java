@@ -37,8 +37,8 @@ public class CropApiView extends View {
         int height = canvas.getHeight();
 
         int top    = (height / 2) - 100;
-        int left   = 70;
-        int right  = width - left;
+        int left   = 0; //70;
+        int right  = width; // - left;
         int bottom = top;
 
         if (height > 540) { bottom += 250; }
@@ -56,12 +56,12 @@ public class CropApiView extends View {
         Log.d(TAG, "fabricante: " + facture);
 
         setBackground(canvas, 0, 0, width, top);
-		setBackground(canvas, 0, top, left, bottom);
-		setBackground(canvas, right, top, width, bottom);
+		//setBackground(canvas, 0, top, left, bottom);
+		//setBackground(canvas, right, top, width, bottom);
 		setBackground(canvas, 0, bottom, width, height);
 
         Paint paint = new Paint();
-              paint.setColor(Color.WHITE);
+              paint.setColor(Color.TRANSPARENT);
               paint.setAntiAlias(true);
 		      paint.setStyle(Paint.Style.STROKE);
               paint.setStrokeWidth(1);
@@ -78,7 +78,7 @@ public class CropApiView extends View {
               rect_paint.setAntiAlias(true);
               rect_paint.setStyle(Paint.Style.FILL);
               rect_paint.setColor(Color.BLACK);
-              rect_paint.setAlpha(0x80);
+              rect_paint.setAlpha(0x95);
 
         canvas.drawRect(left, top, right, bottom, rect_paint);
     }

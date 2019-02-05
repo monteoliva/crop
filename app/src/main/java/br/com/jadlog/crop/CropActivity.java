@@ -1,19 +1,20 @@
 package br.com.jadlog.crop;
 
+import android.app.Activity;
 import android.content.Intent;
-import android.os.Handler;
+import android.graphics.Bitmap;
 import android.support.annotation.NonNull;
 import android.os.Bundle;
-import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
 import android.widget.ImageView;
 
+import br.com.jadlog.crop.bean.CropHashBean;
 import br.com.jadlog.crop.ui.CropApi;
+import br.com.jadlog.crop.ui.EncodeImage;
 import br.com.jadlog.crop.ui.OnCropApiListener;
 
 public class CropActivity extends CordovaActivity implements View.OnClickListener {
-    private static final String TAG = "CropApi";
-
     private CropApi cropApi;
     private ImageView btn;
 
@@ -51,29 +52,31 @@ public class CropActivity extends CordovaActivity implements View.OnClickListene
 
     @Override
     public void onClick(View v) {
-        if (v == btn) {
-            cropApi.takePicture(new OnCropApiListener() {
-                @Override
-                public void onCropHash(String hash) {
-                    Log.d(TAG, "HASH: " + hash);
-
-//                    Intent intent = new Intent();
-//                    intent.putExtra("hash", hash);
-//                    setResult(0, intent);
-//                    finish();
-
-                    openFinally(hash);
-                }
-            });
-        }
+        if (v == btn) { takePicture(); }
     }
 
-    private void openFinally(String hash) {
-        Intent intent = new Intent(this, FinallyActivity_.class);
-//        intent.putExtra("HASH", hash);
-//
-        startActivity(intent);
-        finish();
-        overridePendingTransition( R.anim.righttoleft, R.anim.stable );
+    private void takePicture() {
+        cropApi.takePicture(new OnCropApiListener() {
+            @Override
+            public void onCropHash(String hash) {
+                CropHashBean cropHashBean = new CropHashBean();
+                cropHashBean.setHash(hash);
+
+                Bundle bundle = new Bundle();
+                bundle.putSerializable("HASH", cropHashBean);
+
+                final Bitmap bitmap = new EncodeImage().decodeImageBase64(hash);
+                Intent intent = new Intent();
+                intent.putExtra("HASH_BUNDLE", bundle);
+                setResult(Activity.RESULT_OK, intent);
+                finish();
+            }
+        });
+    }
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if (keyCode == KeyEvent.KEYCODE_BACK) { finish(); return false; }
+        else                                  { return super.onKeyDown(keyCode, event); }
     }
 }
