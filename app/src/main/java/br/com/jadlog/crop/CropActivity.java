@@ -1,7 +1,7 @@
 package br.com.jadlog.crop;
 
 import android.content.Intent;
-import android.graphics.Bitmap;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.os.Bundle;
 import android.util.Log;
@@ -54,18 +54,26 @@ public class CropActivity extends CordovaActivity implements View.OnClickListene
         if (v == btn) {
             cropApi.takePicture(new OnCropApiListener() {
                 @Override
-                public void onCropBitmap(Bitmap bitmap) {}
-
-                @Override
                 public void onCropHash(String hash) {
                     Log.d(TAG, "HASH: " + hash);
 
-                    Intent intent = new Intent();
-                    intent.putExtra("hash", hash);
-                    setResult(0, intent);
-                    finish();
+//                    Intent intent = new Intent();
+//                    intent.putExtra("hash", hash);
+//                    setResult(0, intent);
+//                    finish();
+
+                    openFinally(hash);
                 }
             });
         }
+    }
+
+    private void openFinally(String hash) {
+        Intent intent = new Intent(this, FinallyActivity_.class);
+//        intent.putExtra("HASH", hash);
+//
+        startActivity(intent);
+        finish();
+        overridePendingTransition( R.anim.righttoleft, R.anim.stable );
     }
 }

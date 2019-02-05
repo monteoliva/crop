@@ -162,11 +162,15 @@ public class CropApiCamera extends FrameLayout {
 					rect.getRight(),
 					bottom);
 
-			String hash = encodeImage.encodeImage(output);
+			int width = (output.getWidth() > 800) ? 800 : output.getWidth();
+
+			Bitmap bmp = Bitmap.createScaledBitmap(output, width, output.getHeight(), false);
+
+			Log.d(TAG, "Bitmap width: " + bmp.getWidth());
+            Log.d(TAG, "Bitmap height: " + bmp.getHeight());
 
 			if (listener != null) {
-				listener.onCropBitmap(output);
-				listener.onCropHash(hash);
+			    listener.onCropHash(encodeImage.encodeImage(bmp));
 			}
 		}
 	};

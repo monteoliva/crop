@@ -4,14 +4,12 @@ import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
 import android.content.pm.PackageManager;
-import android.graphics.Bitmap;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.ImageView;
 import android.widget.RelativeLayout;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -25,14 +23,12 @@ import com.google.android.gms.vision.face.FaceDetector;
 import java.io.IOException;
 
 import br.com.jadlog.crop.R;
+import br.com.jadlog.crop.component.CropFlash;
 
 public class CropApi extends RelativeLayout {
     private CameraSource mCameraSource;
     private CropApiCamera mPreview;
     private View view;
-    private ImageView imgFlash;
-
-    private boolean isFlash = false;
 
     // permission request codes need to be < 256
     private static final int RC_HANDLE_CAMERA_PERM = 200;
@@ -40,11 +36,6 @@ public class CropApi extends RelativeLayout {
     // pega os Uses Permissions
     private static final String[] permissions = new String[] {
             Manifest.permission.CAMERA
-    };
-
-    private static final int[] resources = new int[] {
-            R.drawable.ic_flash_on,
-            R.drawable.ic_flash_off
     };
 
     /**
@@ -65,28 +56,18 @@ public class CropApi extends RelativeLayout {
         // pega a View
         view = inflater.inflate(R.layout.crop_api, this);
 
-        mPreview  = view.findViewById(R.id.facePreview);
-        imgFlash  = view.findViewById(R.id.imgFlash);
-        imgFlash.setOnClickListener(new OnClickListener() {
+        mPreview = view.findViewById(R.id.facePreview);
+
+        final CropFlash cropFlash = view.findViewById(R.id.imgFlash);
+        cropFlash.setCropApiCamera(mPreview);
+        cropFlash.setOnClickListener(new OnClickListener() {
             @Override
-            public void onClick(View v) { setImgFlash(); }
+            public void onClick(View v) { cropFlash.setFlash(); }
         });
 
         final int rc1 = ActivityCompat.checkSelfPermission(getContext(), permissions[0]);
         if (rc1 == PackageManager.PERMISSION_GRANTED) { startCameraSource(); }
         else { requestCameraPermission(); }
-    }
-
-    public void setImgFlash() {
-        if (mPreview != null) {
-            isFlash = !isFlash;
-
-            final int image = (!isFlash) ? resources[1] : resources[0];
-
-            mPreview.setFlash(isFlash);
-
-            imgFlash.setImageDrawable(getResources().getDrawable(image));
-        }
     }
 
     /*******************************************************************************
@@ -139,11 +120,6 @@ public class CropApi extends RelativeLayout {
     public void takePicture(@NonNull final OnCropApiListener listener) {
         if (mPreview != null) {
             mPreview.takePicture(new OnCropApiListener() {
-                @Override
-                public void onCropBitmap(Bitmap bitmap) {
-                    listener.onCropBitmap(bitmap);
-                }
-
                 @Override
                 public void onCropHash(String hash) {
                     listener.onCropHash(hash);
