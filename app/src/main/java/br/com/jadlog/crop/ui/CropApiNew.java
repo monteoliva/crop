@@ -4,7 +4,6 @@ import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
 import android.content.pm.PackageManager;
-import android.graphics.Bitmap;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -25,9 +24,8 @@ import java.io.IOException;
 
 import br.com.jadlog.crop.R;
 
-public class CropApi extends FrameLayout {
-    private CameraSource mCameraSource;
-    private CropApiCamera mPreview;
+public class CropApiNew extends FrameLayout {
+    private CropApiCameraNew mPreview;
     private View view;
 
     // permission request codes need to be < 256
@@ -43,8 +41,8 @@ public class CropApi extends FrameLayout {
      *
      * @param context
      */
-    public CropApi(Context context)                     { super(context);         init(); }
-    public CropApi(Context context, AttributeSet attrs) { super(context, attrs); init(); }
+    public CropApiNew(Context context)                     { super(context);         init(); }
+    public CropApiNew(Context context, AttributeSet attrs) { super(context, attrs); init(); }
 
     private void init() {
         // seta o Background
@@ -59,55 +57,8 @@ public class CropApi extends FrameLayout {
         mPreview = view.findViewById(R.id.facePreview);
 
         final int rc1 = ActivityCompat.checkSelfPermission(getContext(), permissions[0]);
-        if (rc1 == PackageManager.PERMISSION_GRANTED) { startCameraSource(); }
+        if (rc1 == PackageManager.PERMISSION_GRANTED) { mPreview.start(); }
         else { requestCameraPermission(); }
-    }
-
-    /*******************************************************************************
-     * Camera Source
-     *******************************************************************************/
-    public void createCameraSource() {
-        FaceDetector detector = new FaceDetector.Builder(getContext()).build();
-
-        detector.setProcessor(new MultiProcessor.Builder<>(new GraphicFaceTrackerFactory()).build());
-
-        if (!detector.isOperational()) {
-        }
-
-        // start Google Vision
-        mCameraSource = new CameraSource.Builder(getContext(), detector)
-                .setFacing(CameraSource.CAMERA_FACING_BACK)
-                .setRequestedFps(30f)
-                .setAutoFocusEnabled(true)
-                .build();
-    }
-
-    private void startCameraSource() {
-        // check that the device has play services available.
-        int code = GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(getContext());
-        if (code != ConnectionResult.SUCCESS) {}
-
-        // verifi
-        if (mCameraSource != null) {
-            try {
-                mPreview.start(mCameraSource);
-            }
-            catch (IOException e) {
-                mCameraSource.release();
-                mCameraSource = null;
-            }
-        }
-        else {
-            createCameraSource();
-            startCameraSource();
-        }
-    }
-
-    public void stopCameraSource() {
-        if (mCameraSource != null) {
-            mCameraSource.release();
-            mCameraSource = null;
-        }
     }
 
     public void takePicture(@NonNull final OnCropApiListener listener) {
@@ -122,14 +73,6 @@ public class CropApi extends FrameLayout {
     }
 
     /*******************************************************************************
-     * Tracker Factory
-     *******************************************************************************/
-    private class GraphicFaceTrackerFactory implements MultiProcessor.Factory<Face> {
-        @Override
-        public Tracker<Face> create(Face face) { return null; }
-    }
-
-    /*******************************************************************************
      * Camera Permission
      *******************************************************************************/
     private void requestCameraPermission() {
@@ -139,7 +82,7 @@ public class CropApi extends FrameLayout {
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         if (requestCode == RC_HANDLE_CAMERA_PERM) {
             if (grantResults.length != 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                startCameraSource();
+                mPreview.start();
             }
         }
     }
@@ -148,8 +91,7 @@ public class CropApi extends FrameLayout {
      * Life Circle
      *******************************************************************************/
     public void onPause() {
-        if (mPreview != null) { mPreview.stop(); }
+        mPreview.release();
     }
-
-    public void onDestroy() { stopCameraSource(); }
+    public void onDestroy() { mPreview.release(); }
 }

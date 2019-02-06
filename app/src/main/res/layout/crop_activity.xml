@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/layoutView"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <br.com.jadlog.crop.ui.CropApi
+    <br.com.jadlog.crop.ui.CropApiNew
         android:id="@+id/crop"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />

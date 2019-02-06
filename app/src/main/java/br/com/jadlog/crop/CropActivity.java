@@ -8,15 +8,18 @@ import android.os.Bundle;
 import android.view.KeyEvent;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 
 import br.com.jadlog.crop.bean.CropHashBean;
 import br.com.jadlog.crop.ui.CropApi;
+import br.com.jadlog.crop.ui.CropApiNew;
 import br.com.jadlog.crop.ui.EncodeImage;
 import br.com.jadlog.crop.ui.OnCropApiListener;
 
 public class CropActivity extends CordovaActivity implements View.OnClickListener {
-    private CropApi cropApi;
+    private CropApiNew cropApi;
     private ImageView btn;
+    private RelativeLayout layoutView;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -24,6 +27,8 @@ public class CropActivity extends CordovaActivity implements View.OnClickListene
         setContentView(R.layout.crop_activity);
 
         cropApi = findViewById(R.id.crop);
+
+        layoutView = findViewById(R.id.layoutView);
 
         btn = findViewById(R.id.takePicture);
         btn.setOnClickListener(this);

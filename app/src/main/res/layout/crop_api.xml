@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <br.com.jadlog.crop.ui.CropApiCamera
+    <br.com.jadlog.crop.ui.CropApiCameraNew
         android:id="@+id/facePreview"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
