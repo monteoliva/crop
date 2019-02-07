@@ -1,25 +1,16 @@
 package br.com.jadlog.crop.ui;
 
 import android.content.Context;
-import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
-import android.hardware.Camera;
-import android.os.Build;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.View;
-
-import com.google.android.gms.vision.CameraSource;
 
 public class CropApiView extends View {
     private static final String TAG = "CropAPI";
-
-    private CameraSource cameraSource;
 
     private Rect rect = new Rect(0, 0, 0, 0);
 
@@ -45,23 +36,19 @@ public class CropApiView extends View {
         int height = canvas.getHeight();
 
         int top    = (height / 2) - 100;
-        int left   = 0; //70;
-        int right  = width; // - left;
+        int left   = 0;
+        int right  = width;
         int bottom = top;
 
         if (height > 540) { bottom += 200; }
         else              { bottom += 120; }
 
-        //rect.setWidht(width);
-        //rect.setHeight(height);
         rect.top    = top;
         rect.left   = left;
         rect.right  = right;
         rect.bottom = bottom;
 
         setBackground(canvas, 0, 0, width, top);
-		//setBackground(canvas, 0, top, left, bottom);
-		//setBackground(canvas, right, top, width, bottom);
 		setBackground(canvas, 0, bottom, width, height);
 
         Paint paint = new Paint();

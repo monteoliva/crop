@@ -12,12 +12,11 @@ import android.widget.RelativeLayout;
 
 import br.com.jadlog.crop.bean.CropHashBean;
 import br.com.jadlog.crop.ui.CropApi;
-import br.com.jadlog.crop.ui.CropApiNew;
 import br.com.jadlog.crop.ui.EncodeImage;
 import br.com.jadlog.crop.ui.OnCropApiListener;
 
 public class CropActivity extends CordovaActivity implements View.OnClickListener {
-    private CropApiNew cropApi;
+    private CropApi cropApi;
     private ImageView btn;
     private RelativeLayout layoutView;
 
