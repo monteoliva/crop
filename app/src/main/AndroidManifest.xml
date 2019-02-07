@@ -3,11 +3,9 @@
     package="br.com.jadlog.crop">
 
     <uses-permission android:name="android.permission.CAMERA" />
-    <uses-permission android:name="android.permission.FLASHLIGHT" /> <!-- Feature -->
     <uses-feature
         android:name="android.hardware.camera2"
         android:required="true" />
-    <uses-feature android:name="android.hardware.camera2.flash" /> <!-- Screens Supports -->
     <supports-screens
         android:anyDensity="true"
         android:largeScreens="true"

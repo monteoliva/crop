@@ -92,18 +92,18 @@ public class CropApiCamera extends FrameLayout {
     }
 
     private String crop() {
-        Bitmap source = mTextureView.getBitmap(mTextureView.getWidth(), mTextureView.getHeight());
-        Rect rect     = mView.getRect();
-        int bottom    = rect.bottom - rect.top;
+        final Bitmap source = mTextureView.getBitmap(mTextureView.getWidth(), mTextureView.getHeight());
+        final Rect rect     = mView.getRect();
+        final int bottom    = rect.bottom - rect.top;
 
-        Bitmap output = Bitmap.createBitmap(source,
+        final Bitmap output = Bitmap.createBitmap(source,
 					rect.left,
 					rect.top,
 					rect.right,
 					bottom);
 
-		int width  = (output.getWidth() > 800) ? 800 : output.getWidth();
-		Bitmap bmp = Bitmap.createScaledBitmap(output, width, output.getHeight(), false);
+        final int width  = (output.getWidth() > 860) ? 860 : output.getWidth();
+        final Bitmap bmp = Bitmap.createScaledBitmap(output, width, output.getHeight(), false);
 
         isPreview = false;
 
