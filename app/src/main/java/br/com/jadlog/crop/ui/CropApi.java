@@ -31,7 +31,7 @@ public class CropApi extends FrameLayout {
      *
      * @param context
      */
-    public CropApi(Context context)                     { super(context);         init(); }
+    public CropApi(Context context)                     { super(context);        init(); }
     public CropApi(Context context, AttributeSet attrs) { super(context, attrs); init(); }
 
     private void init() {
@@ -80,8 +80,6 @@ public class CropApi extends FrameLayout {
     /*******************************************************************************
      * Life Circle
      *******************************************************************************/
-    public void onPause() {
-        mPreview.release();
-    }
+    public void onPause()   { mPreview.release(); }
     public void onDestroy() { mPreview.release(); }
 }

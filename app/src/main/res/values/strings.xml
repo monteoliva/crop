@@ -1,4 +1,8 @@
 <resources>
     <string name="app_name">Crop</string>
     <string name="finally_title">RESULTADO</string>
+
+    <string name="preview_title">Preview</string>
+    <string name="preview_btn1">Refazer</string>
+    <string name="preview_btn2">Confirmar</string>
 </resources>

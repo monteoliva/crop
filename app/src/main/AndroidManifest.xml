@@ -3,9 +3,11 @@
     package="br.com.jadlog.crop">
 
     <uses-permission android:name="android.permission.CAMERA" />
+
     <uses-feature
         android:name="android.hardware.camera2"
         android:required="true" />
+
     <supports-screens
         android:anyDensity="true"
         android:largeScreens="true"
@@ -17,10 +19,11 @@
         android:hardwareAccelerated="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
+        android:largeHeap="true"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme"
-        android:largeHeap="true">
+        android:theme="@style/AppTheme">
+        <activity android:name=".PreviewActivity"></activity>
         <activity
             android:name=".MainActivity"
             android:screenOrientation="landscape">
