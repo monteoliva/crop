@@ -102,12 +102,14 @@ public class CropApiCamera extends FrameLayout {
 					rect.right,
 					bottom);
 
-        final int width  = (output.getWidth() > 860) ? 860 : output.getWidth();
-        final Bitmap bmp = Bitmap.createScaledBitmap(output, width, output.getHeight(), false);
+        final int width  = (output.getWidth()  > 640) ? 640 : output.getWidth();
+        final int height = (output.getHeight() > 200) ? 200 : output.getHeight();
+        final Bitmap bmp = Bitmap.createScaledBitmap(output, width, height, false);
+        final Bitmap ret = new EncodeImage().toGrayscale(bmp);
 
         isPreview = false;
 
-		return new EncodeImage().encodeImage(bmp);
+		return new EncodeImage().encodeImage(ret);
     }
 
     /**********************************************************************
