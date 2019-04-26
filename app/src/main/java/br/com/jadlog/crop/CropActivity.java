@@ -11,8 +11,9 @@ import android.support.v7.app.AlertDialog;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
-import android.widget.RelativeLayout;
+import android.widget.LinearLayout;
 
 import br.com.jadlog.crop.bean.CropHashBean;
 import br.com.jadlog.crop.ui.CropApi;
@@ -21,16 +22,15 @@ import br.com.jadlog.crop.ui.OnCropApiListener;
 
 public class CropActivity extends CordovaActivity implements View.OnClickListener {
     private CropApi cropApi;
-    private ImageView btn;
-    private RelativeLayout layoutView;
+    private LinearLayout btn;
+    private FrameLayout layoutView;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.crop_activity);
 
-        cropApi = findViewById(R.id.crop);
-
+        cropApi    = findViewById(R.id.crop);
         layoutView = findViewById(R.id.layoutView);
 
         btn = findViewById(R.id.takePicture);
