@@ -14,16 +14,19 @@ import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 
 import br.com.jadlog.crop.bean.CropHashBean;
+import br.com.jadlog.crop.component.CropFlash;
 import br.com.jadlog.crop.ui.CropApi;
+import br.com.jadlog.crop.ui.CropApiCamera;
 import br.com.jadlog.crop.ui.EncodeImage;
 import br.com.jadlog.crop.ui.OnCropApiListener;
 
 public class CropActivity extends CordovaActivity implements View.OnClickListener {
     private CropApi cropApi;
     private LinearLayout btn;
-    private FrameLayout layoutView;
+    private RelativeLayout layoutView;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -32,6 +35,13 @@ public class CropActivity extends CordovaActivity implements View.OnClickListene
 
         cropApi    = findViewById(R.id.crop);
         layoutView = findViewById(R.id.layoutView);
+
+        final CropFlash cropFlash = findViewById(R.id.imgFlash);
+        cropFlash.setCropApiCamera(cropApi.getCropApiCamera());
+        cropFlash.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) { cropFlash.setFlash(); }
+        });
 
         btn = findViewById(R.id.takePicture);
         btn.setOnClickListener(this);

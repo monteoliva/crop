@@ -3,10 +3,11 @@
     package="br.com.jadlog.crop">
 
     <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.FLASHLIGHT" />
 
-    <uses-feature
-        android:name="android.hardware.camera2"
-        android:required="true" />
+    <!-- Feature -->
+    <uses-feature android:name="android.hardware.camera2" android:required="true" />
+    <uses-feature android:name="android.hardware.camera2.flash" />
 
     <supports-screens
         android:anyDensity="true"
@@ -23,13 +24,11 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".PreviewActivity"></activity>
         <activity
             android:name=".MainActivity"
             android:screenOrientation="landscape">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
