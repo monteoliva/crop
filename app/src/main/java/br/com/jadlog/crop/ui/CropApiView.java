@@ -4,16 +4,15 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.os.Build;
+import android.graphics.Rect;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.View;
 
 public class CropApiView extends View {
     private static final String TAG = "CropAPI";
 
-    private CropiApiRect rect = new CropiApiRect();
+    private Rect rect = new Rect(0, 0, 0, 0);
 
     /**
      * Constructor
@@ -24,7 +23,7 @@ public class CropApiView extends View {
 
     private void init() { }
 
-    public CropiApiRect getRect() { return this.rect; }
+    public Rect getRect() { return this.rect; }
 
     /**********************************************************************
      * Draw
@@ -37,31 +36,23 @@ public class CropApiView extends View {
         int height = canvas.getHeight();
 
         int top    = (height / 2) - 100;
-        int left   = 70;
-        int right  = width - left;
+        int left   = 0;
+        int right  = width;
         int bottom = top;
 
-        if (height > 540) { bottom += 250; }
+        if (height > 540) { bottom += 200; }
         else              { bottom += 120; }
 
-        rect.setWidht(width);
-        rect.setHeight(height);
-        rect.setTop(top);
-        rect.setLeft(left);
-        rect.setRight(right);
-        rect.setBottom(bottom);
-
-        final String facture = Build.MANUFACTURER;
-
-        Log.d(TAG, "fabricante: " + facture);
+        rect.top    = top;
+        rect.left   = left;
+        rect.right  = right;
+        rect.bottom = bottom;
 
         setBackground(canvas, 0, 0, width, top);
-		setBackground(canvas, 0, top, left, bottom);
-		setBackground(canvas, right, top, width, bottom);
 		setBackground(canvas, 0, bottom, width, height);
 
         Paint paint = new Paint();
-              paint.setColor(Color.WHITE);
+              paint.setColor(Color.TRANSPARENT);
               paint.setAntiAlias(true);
 		      paint.setStyle(Paint.Style.STROKE);
               paint.setStrokeWidth(1);
@@ -78,7 +69,7 @@ public class CropApiView extends View {
               rect_paint.setAntiAlias(true);
               rect_paint.setStyle(Paint.Style.FILL);
               rect_paint.setColor(Color.BLACK);
-              rect_paint.setAlpha(0x80);
+              rect_paint.setAlpha(0x95);
 
         canvas.drawRect(left, top, right, bottom, rect_paint);
     }

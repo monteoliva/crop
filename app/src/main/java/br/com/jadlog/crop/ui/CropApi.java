@@ -10,23 +10,11 @@ import android.support.v4.content.ContextCompat;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.RelativeLayout;
-
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.GoogleApiAvailability;
-import com.google.android.gms.vision.CameraSource;
-import com.google.android.gms.vision.MultiProcessor;
-import com.google.android.gms.vision.Tracker;
-import com.google.android.gms.vision.face.Face;
-import com.google.android.gms.vision.face.FaceDetector;
-
-import java.io.IOException;
+import android.widget.FrameLayout;
 
 import br.com.jadlog.crop.R;
-import br.com.jadlog.crop.component.CropFlash;
 
-public class CropApi extends RelativeLayout {
-    private CameraSource mCameraSource;
+public class CropApi extends FrameLayout {
     private CropApiCamera mPreview;
     private View view;
 
@@ -43,7 +31,7 @@ public class CropApi extends RelativeLayout {
      *
      * @param context
      */
-    public CropApi(Context context)                     { super(context);         init(); }
+    public CropApi(Context context)                     { super(context);        init(); }
     public CropApi(Context context, AttributeSet attrs) { super(context, attrs); init(); }
 
     private void init() {
@@ -58,63 +46,9 @@ public class CropApi extends RelativeLayout {
 
         mPreview = view.findViewById(R.id.facePreview);
 
-        final CropFlash cropFlash = view.findViewById(R.id.imgFlash);
-        cropFlash.setCropApiCamera(mPreview);
-        cropFlash.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) { cropFlash.setFlash(); }
-        });
-
         final int rc1 = ActivityCompat.checkSelfPermission(getContext(), permissions[0]);
-        if (rc1 == PackageManager.PERMISSION_GRANTED) { startCameraSource(); }
+        if (rc1 == PackageManager.PERMISSION_GRANTED) { mPreview.start(); }
         else { requestCameraPermission(); }
-    }
-
-    /*******************************************************************************
-     * Camera Source
-     *******************************************************************************/
-    public void createCameraSource() {
-        FaceDetector detector = new FaceDetector.Builder(getContext()).build();
-
-        detector.setProcessor(new MultiProcessor.Builder<>(new GraphicFaceTrackerFactory()).build());
-
-        if (!detector.isOperational()) {
-        }
-
-        // start Google Vision
-        mCameraSource = new CameraSource.Builder(getContext(), detector)
-                .setFacing(CameraSource.CAMERA_FACING_BACK)
-                .setRequestedFps(30f)
-                .setAutoFocusEnabled(true)
-                .build();
-    }
-
-    private void startCameraSource() {
-        // check that the device has play services available.
-        int code = GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(getContext());
-        if (code != ConnectionResult.SUCCESS) {}
-
-        // verifi
-        if (mCameraSource != null) {
-            try {
-                mPreview.start(mCameraSource);
-            }
-            catch (IOException e) {
-                mCameraSource.release();
-                mCameraSource = null;
-            }
-        }
-        else {
-            createCameraSource();
-            startCameraSource();
-        }
-    }
-
-    private void stopCameraSource() {
-        if (mCameraSource != null) {
-            mCameraSource.release();
-            mCameraSource = null;
-        }
     }
 
     public void takePicture(@NonNull final OnCropApiListener listener) {
@@ -129,14 +63,6 @@ public class CropApi extends RelativeLayout {
     }
 
     /*******************************************************************************
-     * Tracker Factory
-     *******************************************************************************/
-    private class GraphicFaceTrackerFactory implements MultiProcessor.Factory<Face> {
-        @Override
-        public Tracker<Face> create(Face face) { return null; }
-    }
-
-    /*******************************************************************************
      * Camera Permission
      *******************************************************************************/
     private void requestCameraPermission() {
@@ -146,7 +72,7 @@ public class CropApi extends RelativeLayout {
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         if (requestCode == RC_HANDLE_CAMERA_PERM) {
             if (grantResults.length != 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                startCameraSource();
+                mPreview.start();
             }
         }
     }
@@ -154,9 +80,6 @@ public class CropApi extends RelativeLayout {
     /*******************************************************************************
      * Life Circle
      *******************************************************************************/
-    public void onPause() {
-        if (mPreview != null) { mPreview.stop(); }
-    }
-
-    public void onDestroy() { stopCameraSource(); }
+    public void onPause()   { mPreview.release(); }
+    public void onDestroy() { mPreview.release(); }
 }

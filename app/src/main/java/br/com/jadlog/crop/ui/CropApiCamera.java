@@ -1,202 +1,177 @@
 package br.com.jadlog.crop.ui;
 
+import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.Rect;
+import android.graphics.SurfaceTexture;
 import android.hardware.Camera;
 import android.support.annotation.NonNull;
-import android.support.v4.content.ContextCompat;
 import android.util.AttributeSet;
-import android.util.Log;
-import android.view.SurfaceHolder;
-import android.view.SurfaceView;
+import android.view.Surface;
+import android.view.TextureView;
 import android.widget.FrameLayout;
 
-import com.google.android.gms.vision.CameraSource;
-
 import java.io.IOException;
-import java.lang.reflect.Field;
 
 public class CropApiCamera extends FrameLayout {
-	private static final String TAG = "CropAPI";
+    private static final String TAG = "CropApi";
 
-	private SurfaceView mSurfaceView;
-	private CameraSource mCameraSource;
-	private OnCropApiListener listener;
-	private CropApiView mView;
+    private TextureView mTextureView;
+    private Camera mCamera;
+    private CropApiView mView;
 
-	private boolean mStartRequested;
-	private boolean mSurfaceAvailable;
+    public static final int NR_CAMERA_BACK  = 0;
 
-	/**
-	 * Constructor
-	 */
-	public CropApiCamera(Context context)                     { super(context);        init(); }
-	public CropApiCamera(Context context, AttributeSet attrs) { super(context, attrs); init(); }
+    private boolean isPreview = false;
 
-	/**
-	 * Metodo de inicializacao
-	 */
-	private void init() {
-		// seta o Background
-		setBackgroundColor(ContextCompat.getColor(getContext(), android.R.color.transparent));
+    /**
+     * Constructor
+     *
+     * @param context
+     */
+    public CropApiCamera(Context context) { super(context); }
+    public CropApiCamera(Context context, AttributeSet attrs) { super(context, attrs); }
 
-		LayoutParams layoutParams = new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
+    public void start() {
+        LayoutParams layoutParams = new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
 
-		mSurfaceView = new SurfaceView(getContext());
-		mSurfaceView.getHolder().addCallback(callback);
+        mTextureView = new TextureView(getContext());
+        mTextureView.setSurfaceTextureListener(callback2);
 
-		mView = new CropApiView(getContext());
+        mView = new CropApiView(getContext());
 
-		addView(mSurfaceView, layoutParams);
-		addView(mView, layoutParams);
-	}
+        addView(mTextureView, layoutParams);
+        addView(mView, layoutParams);
+    }
 
-	public void start(CameraSource cameraSource) throws IOException {
-		if (cameraSource == null) { stop(); }
+    public void release() {
+        if (mCamera != null && isPreview) {
+            mCamera.stopPreview();
+            mCamera.release();
+            isPreview = false;
+        }
+    }
 
-		mCameraSource = cameraSource;
+    private void open(@NonNull SurfaceTexture surface) {
+        if (isPreview) { return; }
 
-		if (mCameraSource != null) {
-			mStartRequested = true;
-			startIfReady();
-		}
-	}
+        // pega a tela
+        final Activity tela = (Activity) getContext();
 
-	public void stop() {
-		if (mCameraSource != null) { mCameraSource.stop(); }
-	}
+        // pega a orientacao da camera
+        final int orientacao = getCameraDisplayOrientation(tela, NR_CAMERA_BACK);
 
-	public void release() {
-		if (mCameraSource != null) {
-			mCameraSource.release();
-			mCameraSource = null;
-		}
-	}
+        mCamera = Camera.open(NR_CAMERA_BACK);
 
-	public void takePicture(@NonNull OnCropApiListener listener) {
-		if (mCameraSource != null) {
-			this.listener = listener;
-			mCameraSource.takePicture(myShutterCallback, myPictureCallback);
-		}
-	}
+        try {
+            Camera.Parameters param = mCamera.getParameters();
 
-	private void startIfReady() throws IOException, SecurityException {
-		if (mStartRequested && mSurfaceAvailable) {
-			SurfaceHolder surfaceHolder = mSurfaceView.getHolder();
-			surfaceHolder.setFixedSize(getWidth(), getHeight());
-			mCameraSource.start(surfaceHolder);
+            if (param.getSupportedFocusModes().contains("continuous-video")) {
+                param.setFocusMode("continuous-video");
+            }
 
-			mStartRequested = false;
-		}
-	}
+            mCamera.setParameters(param);
+            mCamera.setDisplayOrientation(orientacao);
+            mCamera.setPreviewTexture(surface);
+            mCamera.startPreview();
 
-	public void setFlash(@NonNull boolean flash) {
-		Camera camera = getCamera(mCameraSource);
+            isPreview = true;
+        }
+        catch (IOException ioe) {
+            // Something bad happened
+        }
+    }
 
-		String[] modes = new String[] {
-				Camera.Parameters.FLASH_MODE_TORCH,
-				Camera.Parameters.FLASH_MODE_OFF
-		};
+    public void takePicture(@NonNull OnCropApiListener listener) {
+        if (mCamera != null) {
+            if (mTextureView.isAvailable()) {
+                if (listener != null) { listener.onCropHash(crop()); }
+            }
+        }
+    }
 
-		if (camera != null) {
-			try {
-				Camera.Parameters param = camera.getParameters();
-				param.setFlashMode((flash) ? modes[0] : modes[1]);
-				camera.setParameters(param);
-			}
-			catch (Exception e) {}
-		}
-	}
+    private String crop() {
+        final Bitmap source = mTextureView.getBitmap(mTextureView.getWidth(), mTextureView.getHeight());
+        final Rect rect     = mView.getRect();
+        final int bottom    = rect.bottom - rect.top;
 
-	/**********************************************************************
-	 * SurfaceHolder
-	 **********************************************************************/
-	SurfaceHolder.Callback2 callback = new SurfaceHolder.Callback2() {
-		@Override
-		public void surfaceRedrawNeeded(SurfaceHolder holder) {}
-
-		@Override
-		public void surfaceCreated(SurfaceHolder holder) {
-			mSurfaceAvailable = true;
-			try {
-				startIfReady();
-			}
-			catch (IOException e) {
-				Log.d(TAG, "Could not start camera source.", e);
-			}
-		}
-
-		@Override
-		public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {}
-
-		@Override
-		public void surfaceDestroyed(SurfaceHolder holder) {
-			mSurfaceAvailable = false;
-		}
-	};
-
-	/**********************************************************************
-	 * Shutter Callback
-	 **********************************************************************/
-	CameraSource.ShutterCallback myShutterCallback = new CameraSource.ShutterCallback(){
-		@Override
-		public void onShutter() { }
-	};
-	CameraSource.PictureCallback myPictureCallback = new CameraSource.PictureCallback() {
-		@Override
-		public void onPictureTaken(byte[] bytes) {
-			EncodeImage encodeImage = new EncodeImage();
-			CropiApiRect rect       = mView.getRect();
-
-			int top    = rect.getTop();
-			int bottom = rect.getTop();
-
-			if (rect.getHeight() > 540) {
-				bottom -= 150;
-			}
-
-			Bitmap source = encodeImage.decodedBitmap(bytes, rect.getWidht(), rect.getHeight());
-			Bitmap output = Bitmap.createBitmap(source,
-					rect.getLeft(),
-					top,
-					rect.getRight(),
+        final Bitmap output = Bitmap.createBitmap(source,
+					rect.left,
+					rect.top,
+					rect.right,
 					bottom);
 
-			int width = (output.getWidth() > 800) ? 800 : output.getWidth();
+        final int width  = (output.getWidth()  > 640) ? 640 : output.getWidth();
+        final int height = (output.getHeight() > 200) ? 200 : output.getHeight();
+        final Bitmap bmp = Bitmap.createScaledBitmap(output, width, height, false);
+        final Bitmap ret = new EncodeImage().toGrayscale(bmp);
 
-			Bitmap bmp = Bitmap.createScaledBitmap(output, width, output.getHeight(), false);
+        isPreview = false;
 
-			Log.d(TAG, "Bitmap width: " + bmp.getWidth());
-            Log.d(TAG, "Bitmap height: " + bmp.getHeight());
+		return new EncodeImage().encodeImage(ret);
+    }
 
-			if (listener != null) {
-			    listener.onCropHash(encodeImage.encodeImage(bmp));
-			}
-		}
-	};
+    /**********************************************************************
+     * TextureView Listener
+     **********************************************************************/
+    TextureView.SurfaceTextureListener callback2 = new TextureView.SurfaceTextureListener() {
+        @Override
+        public void onSurfaceTextureAvailable(SurfaceTexture surface, int width, int height) {
+            open(surface);
+        }
 
-	/**********************************************************************
-	 * Camera Hardware
-	 **********************************************************************/
-	private static Camera getCamera(@NonNull CameraSource cameraSource) {
-		Field[] declaredFields = CameraSource.class.getDeclaredFields();
+        @Override
+        public void onSurfaceTextureSizeChanged(SurfaceTexture surface, int width, int height) {
 
-		for (Field field : declaredFields) {
-			if (field.getType() == Camera.class) {
-				field.setAccessible(true);
-				try {
-					Camera camera = (Camera) field.get(cameraSource);
-					if (camera != null) {
-						return camera;
-					}
-					return null;
-				} catch (IllegalAccessException e) {
-					e.printStackTrace();
-				}
-				break;
-			}
-		}
-		return null;
-	}
+        }
 
+        @Override
+        public boolean onSurfaceTextureDestroyed(SurfaceTexture surface) {
+            release();
+            return false;
+        }
+
+        @Override
+        public void onSurfaceTextureUpdated(SurfaceTexture surface) {
+        }
+    };
+
+    /**********************************************************************
+     * Image Utils
+     **********************************************************************/
+    private int getCameraDisplayOrientation(Activity tela, int cameraId) {
+        // seta a rotacao de retorno
+        int rotacao = 0;
+
+        // pega informacoes da Camera
+        final Camera.CameraInfo cameraInfo = new android.hardware.Camera.CameraInfo();
+
+        // pega informacoes da Camera
+        Camera.getCameraInfo(cameraId, cameraInfo);
+
+        // pega a Orientacao atual da Activity
+        final int rotation = tela.getWindowManager().getDefaultDisplay().getRotation();
+
+        // pega a rotacao da SurfaceView
+        int degrees = 0;
+        switch (rotation) {
+            case Surface.ROTATION_0:   degrees =   0; break;
+            case Surface.ROTATION_90:  degrees =  90; break;
+            case Surface.ROTATION_180: degrees = 180; break;
+            case Surface.ROTATION_270: degrees = 270; break;
+        }
+
+        // calcula a rotacao (orientacao)
+        if (cameraInfo.facing == Camera.CameraInfo.CAMERA_FACING_FRONT) {
+            rotacao = (cameraInfo.orientation + degrees) % 360;
+            rotacao = (360 - rotacao) % 360;  // compensate the mirror
+        }
+        else {
+            rotacao = (cameraInfo.orientation - degrees + 360) % 360;
+        }
+
+        // retorna a rotacao
+        return rotacao;
+    }
 }

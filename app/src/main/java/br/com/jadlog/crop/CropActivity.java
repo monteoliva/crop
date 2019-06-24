@@ -1,28 +1,37 @@
 package br.com.jadlog.crop;
 
+import android.app.Activity;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
-import android.os.Handler;
+import android.graphics.Bitmap;
 import android.support.annotation.NonNull;
 import android.os.Bundle;
-import android.util.Log;
+import android.support.v7.app.AlertDialog;
+import android.view.KeyEvent;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 
+import br.com.jadlog.crop.bean.CropHashBean;
 import br.com.jadlog.crop.ui.CropApi;
+import br.com.jadlog.crop.ui.EncodeImage;
 import br.com.jadlog.crop.ui.OnCropApiListener;
 
 public class CropActivity extends CordovaActivity implements View.OnClickListener {
-    private static final String TAG = "CropApi";
-
     private CropApi cropApi;
-    private ImageView btn;
+    private LinearLayout btn;
+    private FrameLayout layoutView;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.crop_activity);
 
-        cropApi = findViewById(R.id.crop);
+        cropApi    = findViewById(R.id.crop);
+        layoutView = findViewById(R.id.layoutView);
 
         btn = findViewById(R.id.takePicture);
         btn.setOnClickListener(this);
@@ -51,29 +60,56 @@ public class CropActivity extends CordovaActivity implements View.OnClickListene
 
     @Override
     public void onClick(View v) {
-        if (v == btn) {
-            cropApi.takePicture(new OnCropApiListener() {
-                @Override
-                public void onCropHash(String hash) {
-                    Log.d(TAG, "HASH: " + hash);
-
-//                    Intent intent = new Intent();
-//                    intent.putExtra("hash", hash);
-//                    setResult(0, intent);
-//                    finish();
-
-                    openFinally(hash);
-                }
-            });
-        }
+        if (v == btn) { takePicture(); }
     }
 
-    private void openFinally(String hash) {
-        Intent intent = new Intent(this, FinallyActivity_.class);
-//        intent.putExtra("HASH", hash);
-//
-        startActivity(intent);
+    private void takePicture() {
+        cropApi.takePicture(new OnCropApiListener() {
+            @Override
+            public void onCropHash(String hash) { confirm(hash); }
+        });
+    }
+
+    private void setResultData(@NonNull String hash) {
+        CropHashBean cropHashBean = new CropHashBean();
+        cropHashBean.setHash(hash);
+
+        Bundle bundle = new Bundle();
+        bundle.putSerializable("HASH", cropHashBean);
+
+        Intent intent = new Intent();
+        intent.putExtra("HASH_BUNDLE", bundle);
+        setResult(Activity.RESULT_OK, intent);
         finish();
-        overridePendingTransition( R.anim.righttoleft, R.anim.stable );
+    }
+
+    private void confirm(@NonNull final String hash) {
+        final LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        final View view = inflater.inflate(R.layout.crop_confirm, null);
+        final Bitmap bitmap = new EncodeImage().decodeImageBase64(hash);
+
+        ((ImageView) view.findViewById(R.id.imgResult)).setImageBitmap(bitmap);
+
+        AlertDialog.Builder dialog = new AlertDialog.Builder(this, R.style.AlertDialogTheme);
+        dialog.setView(view);
+        dialog.setCancelable(false);
+        dialog.setNegativeButton(R.string.preview_btn1, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int whichButton) {
+            }
+        });
+        dialog.setPositiveButton(R.string.preview_btn2, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int whichButton) {
+                setResultData(hash);
+            }
+        });
+
+        final AlertDialog alertDialog = dialog.create();
+        alertDialog.show();
+    }
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if (keyCode == KeyEvent.KEYCODE_BACK) { finish(); return false; }
+        else                                  { return super.onKeyDown(keyCode, event); }
     }
 }
