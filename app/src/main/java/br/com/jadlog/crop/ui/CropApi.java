@@ -13,6 +13,7 @@ import android.view.View;
 import android.widget.FrameLayout;
 
 import br.com.jadlog.crop.R;
+import br.com.jadlog.crop.component.CropFlash;
 
 public class CropApi extends FrameLayout {
     private CropApiCamera mPreview;
@@ -61,6 +62,8 @@ public class CropApi extends FrameLayout {
             });
         }
     }
+
+    public CropApiCamera getCropApiCamera() { return mPreview; }
 
     /*******************************************************************************
      * Camera Permission

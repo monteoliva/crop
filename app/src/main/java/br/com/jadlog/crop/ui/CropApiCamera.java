@@ -112,6 +112,22 @@ public class CropApiCamera extends FrameLayout {
 		return new EncodeImage().encodeImage(ret);
     }
 
+    public void setFlash(@NonNull boolean flash) {
+        if (mCamera == null) { return; }
+
+        String[] modes = new String[] {
+                Camera.Parameters.FLASH_MODE_TORCH,
+                Camera.Parameters.FLASH_MODE_OFF
+        };
+
+        try {
+            Camera.Parameters param = mCamera.getParameters();
+            param.setFlashMode((flash) ? modes[0] : modes[1]);
+            mCamera.setParameters(param);
+        }
+        catch (Exception e) {}
+    }
+
     /**********************************************************************
      * TextureView Listener
      **********************************************************************/
