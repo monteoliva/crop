@@ -86,12 +86,12 @@ public class CropApiCamera extends FrameLayout {
     public void takePicture(@NonNull OnCropApiListener listener) {
         if (mCamera != null) {
             if (mTextureView.isAvailable()) {
-                if (listener != null) { listener.onCropHash(crop()); }
+                if (listener != null) { listener.onCropBytes(crop()); }
             }
         }
     }
 
-    private String crop() {
+    private byte[] crop() {
         final Bitmap source = mTextureView.getBitmap(mTextureView.getWidth(), mTextureView.getHeight());
         final Rect rect     = mView.getRect();
         final int bottom    = rect.bottom - rect.top;
@@ -110,22 +110,6 @@ public class CropApiCamera extends FrameLayout {
         isPreview = false;
 
 		return new EncodeImage().encodeImage(ret);
-    }
-
-    public void setFlash(@NonNull boolean flash) {
-        if (mCamera == null) { return; }
-
-        String[] modes = new String[] {
-                Camera.Parameters.FLASH_MODE_TORCH,
-                Camera.Parameters.FLASH_MODE_OFF
-        };
-
-        try {
-            Camera.Parameters param = mCamera.getParameters();
-            param.setFlashMode((flash) ? modes[0] : modes[1]);
-            mCamera.setParameters(param);
-        }
-        catch (Exception e) {}
     }
 
     /**********************************************************************

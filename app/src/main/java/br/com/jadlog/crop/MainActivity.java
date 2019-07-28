@@ -2,14 +2,12 @@ package br.com.jadlog.crop;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.view.KeyEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
-
-import br.com.jadlog.crop.bean.CropHashBean;
-import br.com.jadlog.crop.ui.EncodeImage;
 
 public class MainActivity extends CordovaActivity implements View.OnClickListener {
     private Button btnCamera;
@@ -38,10 +36,8 @@ public class MainActivity extends CordovaActivity implements View.OnClickListene
         if (requestCode == CODE_BACK) {
             if (resultCode == RESULT_OK) {
                 Bundle bundle = data.getBundleExtra("HASH_BUNDLE");
-                CropHashBean cropHashBean = (CropHashBean) bundle.getSerializable("HASH");
-
-                Bitmap bitmap = new EncodeImage().decodeImageBase64(cropHashBean.getHash());
-
+                byte[] cropHash = bundle.getByteArray("HASH");
+                final Bitmap bitmap = BitmapFactory.decodeByteArray(cropHash, 0, cropHash.length);
                 imageView.setImageBitmap(bitmap);
             }
         }

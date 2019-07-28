@@ -13,7 +13,6 @@ import android.view.View;
 import android.widget.FrameLayout;
 
 import br.com.jadlog.crop.R;
-import br.com.jadlog.crop.component.CropFlash;
 
 public class CropApi extends FrameLayout {
     private CropApiCamera mPreview;
@@ -32,15 +31,15 @@ public class CropApi extends FrameLayout {
      *
      * @param context
      */
-    public CropApi(Context context)                     { super(context);        init(); }
-    public CropApi(Context context, AttributeSet attrs) { super(context, attrs); init(); }
+    public CropApi(Context context)                     { super(context);        init(context); }
+    public CropApi(Context context, AttributeSet attrs) { super(context, attrs); init(context); }
 
-    private void init() {
+    private void init(Context context) {
         // seta o Background
         setBackgroundColor(ContextCompat.getColor(getContext(), android.R.color.transparent));
 
         // pega o inflater
-        final LayoutInflater inflater = (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        final LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
         // pega a View
         view = inflater.inflate(R.layout.crop_api, this);
@@ -56,14 +55,12 @@ public class CropApi extends FrameLayout {
         if (mPreview != null) {
             mPreview.takePicture(new OnCropApiListener() {
                 @Override
-                public void onCropHash(String hash) {
-                    listener.onCropHash(hash);
+                public void onCropBytes(byte[] hash) {
+                    listener.onCropBytes(hash);
                 }
             });
         }
     }
-
-    public CropApiCamera getCropApiCamera() { return mPreview; }
 
     /*******************************************************************************
      * Camera Permission

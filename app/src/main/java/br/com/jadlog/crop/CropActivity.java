@@ -5,22 +5,21 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.support.annotation.NonNull;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 
-import br.com.jadlog.crop.bean.CropHashBean;
-import br.com.jadlog.crop.component.CropFlash;
+import java.util.Arrays;
+
 import br.com.jadlog.crop.ui.CropApi;
-import br.com.jadlog.crop.ui.CropApiCamera;
-import br.com.jadlog.crop.ui.EncodeImage;
 import br.com.jadlog.crop.ui.OnCropApiListener;
 
 public class CropActivity extends CordovaActivity implements View.OnClickListener {
@@ -35,13 +34,6 @@ public class CropActivity extends CordovaActivity implements View.OnClickListene
 
         cropApi    = findViewById(R.id.crop);
         layoutView = findViewById(R.id.layoutView);
-
-        final CropFlash cropFlash = findViewById(R.id.imgFlash);
-        cropFlash.setCropApiCamera(cropApi.getCropApiCamera());
-        cropFlash.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) { cropFlash.setFlash(); }
-        });
 
         btn = findViewById(R.id.takePicture);
         btn.setOnClickListener(this);
@@ -76,16 +68,13 @@ public class CropActivity extends CordovaActivity implements View.OnClickListene
     private void takePicture() {
         cropApi.takePicture(new OnCropApiListener() {
             @Override
-            public void onCropHash(String hash) { confirm(hash); }
+            public void onCropBytes(byte[] hash) { confirm(hash); }
         });
     }
 
-    private void setResultData(@NonNull String hash) {
-        CropHashBean cropHashBean = new CropHashBean();
-        cropHashBean.setHash(hash);
-
+    private void setResultData(@NonNull byte[] hash) {
         Bundle bundle = new Bundle();
-        bundle.putSerializable("HASH", cropHashBean);
+        bundle.putByteArray("HASH", hash);
 
         Intent intent = new Intent();
         intent.putExtra("HASH_BUNDLE", bundle);
@@ -93,10 +82,14 @@ public class CropActivity extends CordovaActivity implements View.OnClickListene
         finish();
     }
 
-    private void confirm(@NonNull final String hash) {
+    private void confirm(@NonNull final byte[] hash) {
         final LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         final View view = inflater.inflate(R.layout.crop_confirm, null);
-        final Bitmap bitmap = new EncodeImage().decodeImageBase64(hash);
+
+        Log.d("CROP","bytes: " + Arrays.toString(hash));
+
+
+        final Bitmap bitmap = BitmapFactory.decodeByteArray(hash, 0, hash.length);
 
         ((ImageView) view.findViewById(R.id.imgResult)).setImageBitmap(bitmap);
 

@@ -17,4 +17,14 @@
         android:orientation="vertical"
         android:background="@android:color/transparent" />
 
+    <br.com.jadlog.crop.component.CropFlash
+        android:id="@+id/imgFlash"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:src="@drawable/ic_flash_off"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
+        android:visibility="gone"
+        android:layout_margin="10dp" />
+
 </RelativeLayout>
