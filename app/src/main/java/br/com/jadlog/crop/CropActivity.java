@@ -9,15 +9,12 @@ import android.graphics.BitmapFactory;
 import android.support.annotation.NonNull;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
-
-import java.util.Arrays;
 
 import br.com.jadlog.crop.ui.CropApi;
 import br.com.jadlog.crop.ui.OnCropApiListener;
@@ -85,9 +82,6 @@ public class CropActivity extends CordovaActivity implements View.OnClickListene
     private void confirm(@NonNull final byte[] hash) {
         final LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         final View view = inflater.inflate(R.layout.crop_confirm, null);
-
-        Log.d("CROP","bytes: " + Arrays.toString(hash));
-
 
         final Bitmap bitmap = BitmapFactory.decodeByteArray(hash, 0, hash.length);
 
